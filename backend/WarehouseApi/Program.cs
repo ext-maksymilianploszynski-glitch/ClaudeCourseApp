@@ -1,8 +1,12 @@
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using WarehouseApi.Data;
 using WarehouseApi.Endpoints;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.ConfigureHttpJsonOptions(options =>
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")
