@@ -8,7 +8,9 @@
       "Bash(\"/c/Users/wladyslaw.lewandows/AppData/Local/Logi/LogiPluginService/PluginHosts/node22/node/npm.cmd\" install:*)",
       "Bash(export PATH=\"/c/Users/wladyslaw.lewandows/AppData/Local/Logi/LogiPluginService/PluginHosts/node22/node:$PATH\")",
       "Bash(grep -E \"\\\\.\\(tsx?|jsx?|json\\)$\")",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(cmd.exe:*)",
+      "Bash(powershell.exe:*)"
     ]
   }
 }
