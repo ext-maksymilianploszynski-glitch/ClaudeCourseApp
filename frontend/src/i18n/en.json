@@ -96,6 +96,8 @@
     "colActions": "Actions",
     "delete": "Delete",
     "selectProduct": "Select product",
+    "qtyLabel": "Qty:",
+    "priceLabel": "Price:",
     "qtyPlaceholder": "Qty",
     "pricePlaceholder": "Price",
     "addItem": "+ Add",

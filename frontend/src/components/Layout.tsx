@@ -4,10 +4,9 @@ import { useTranslation } from 'react-i18next';
 export function Layout() {
   const { t, i18n } = useTranslation();
 
-  const toggleLang = () => {
-    const next = i18n.language === 'pl' ? 'en' : 'pl';
-    i18n.changeLanguage(next);
-    localStorage.setItem('lang', next);
+  const changeLang = (lang: string) => {
+    i18n.changeLanguage(lang);
+    localStorage.setItem('lang', lang);
   };
 
   const navStyle: React.CSSProperties = {
@@ -20,10 +19,10 @@ export function Layout() {
     background: isActive ? 'rgba(56,189,248,0.1)' : 'transparent',
     fontWeight: 500,
   });
-  const langBtnStyle: React.CSSProperties = {
-    marginLeft: 'auto', background: 'rgba(255,255,255,0.1)', border: 'none',
-    color: '#f8fafc', borderRadius: 6, padding: '4px 12px', cursor: 'pointer',
-    fontWeight: 600, fontSize: 13,
+  const langSelectStyle: React.CSSProperties = {
+    marginLeft: 'auto', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)',
+    color: '#f8fafc', borderRadius: 6, padding: '4px 8px', cursor: 'pointer',
+    fontWeight: 600, fontSize: 14, outline: 'none',
   };
 
   return (
@@ -35,9 +34,14 @@ export function Layout() {
         <NavLink to="/" style={linkStyle} end>{t('nav.dashboard')}</NavLink>
         <NavLink to="/products" style={linkStyle}>{t('nav.products')}</NavLink>
         <NavLink to="/orders" style={linkStyle}>{t('nav.orders')}</NavLink>
-        <button style={langBtnStyle} onClick={toggleLang}>
-          {i18n.language === 'pl' ? 'EN' : 'PL'}
-        </button>
+        <select
+          style={langSelectStyle}
+          value={i18n.language}
+          onChange={e => changeLang(e.target.value)}
+        >
+          <option value="pl">🇵🇱 Polski</option>
+          <option value="en">🇬🇧 English</option>
+        </select>
       </nav>
       <main style={{ padding: 32, maxWidth: 1100, margin: '0 auto' }}>
         <Outlet />

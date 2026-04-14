@@ -138,18 +138,24 @@ export function OrderDetail() {
                       <option key={p.id} value={p.id}>{p.name} ({p.sku})</option>
                     ))}
                   </select>
-                  <input
-                    style={{ ...inputSm, width: 80 }}
-                    type="number" min={1} placeholder={t('orderDetail.qtyPlaceholder')}
-                    value={newItem.quantity}
-                    onChange={e => setNewItem(prev => ({ ...prev, quantity: Number(e.target.value) }))}
-                  />
-                  <input
-                    style={{ ...inputSm, width: 100 }}
-                    type="number" min={0} step="0.01" placeholder={t('orderDetail.pricePlaceholder')}
-                    value={newItem.unitPrice}
-                    onChange={e => setNewItem(prev => ({ ...prev, unitPrice: Number(e.target.value) }))}
-                  />
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 13 }}>
+                    <span style={{ color: '#64748b', whiteSpace: 'nowrap' }}>{t('orderDetail.qtyLabel')}</span>
+                    <input
+                      style={{ ...inputSm, width: 70 }}
+                      type="number" min={1} placeholder={t('orderDetail.qtyPlaceholder')}
+                      value={newItem.quantity}
+                      onChange={e => setNewItem(prev => ({ ...prev, quantity: Number(e.target.value) }))}
+                    />
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 13 }}>
+                    <span style={{ color: '#64748b', whiteSpace: 'nowrap' }}>{t('orderDetail.priceLabel')}</span>
+                    <input
+                      style={{ ...inputSm, width: 90 }}
+                      type="number" min={0} step="0.01" placeholder={t('orderDetail.pricePlaceholder')}
+                      value={newItem.unitPrice}
+                      onChange={e => setNewItem(prev => ({ ...prev, unitPrice: Number(e.target.value) }))}
+                    />
+                  </label>
                   <button
                     onClick={() => {
                       if (!newItem.productId) { setAddError(t('orderDetail.selectProductError')); return; }

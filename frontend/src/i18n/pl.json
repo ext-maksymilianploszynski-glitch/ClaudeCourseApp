@@ -96,6 +96,8 @@
     "colActions": "Akcje",
     "delete": "Usun",
     "selectProduct": "Wybierz produkt",
+    "qtyLabel": "Ilosc:",
+    "priceLabel": "Cena:",
     "qtyPlaceholder": "Ilosc",
     "pricePlaceholder": "Cena",
     "addItem": "+ Dodaj",
