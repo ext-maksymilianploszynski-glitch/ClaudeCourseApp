@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { getOrder, confirmOrder, completeOrder, addOrderItem, deleteOrderItem } from '../api/orders';
 import { getProducts } from '../api/products';
 import { orderTypeBadge, orderStatusBadge } from '../components/Badge';
 
 export function OrderDetail() {
+  const { t, i18n } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -32,13 +34,13 @@ export function OrderDetail() {
   const completeMutation = useMutation({
     mutationFn: () => completeOrder(orderId),
     onSuccess: invalidate,
-    onError: (e: any) => alert(e?.response?.data || 'Blad'),
+    onError: (e: any) => alert(e?.response?.data || t('orderDetail.error')),
   });
 
   const addItemMutation = useMutation({
     mutationFn: () => addOrderItem(orderId, { ...newItem }),
     onSuccess: () => { invalidate(); setNewItem({ productId: 0, quantity: 1, unitPrice: 0 }); setAddError(''); },
-    onError: (e: any) => setAddError(e?.response?.data || 'Blad'),
+    onError: (e: any) => setAddError(e?.response?.data || t('orderDetail.error')),
   });
 
   const deleteItemMutation = useMutation({
@@ -46,8 +48,10 @@ export function OrderDetail() {
     onSuccess: invalidate,
   });
 
-  if (isLoading) return <p>Ladowanie...</p>;
-  if (!order) return <p>Nie znaleziono zamowienia.</p>;
+  const dateLocale = i18n.language === 'en' ? 'en-US' : 'pl-PL';
+
+  if (isLoading) return <p>{t('orderDetail.loading')}</p>;
+  if (!order) return <p>{t('orderDetail.orderNotFound')}</p>;
 
   const isDraft = order.status === 'Draft';
   const isConfirmed = order.status === 'Confirmed';
@@ -59,30 +63,30 @@ export function OrderDetail() {
 
   return (
     <div style={{ maxWidth: 800 }}>
-      <button onClick={() => navigate('/orders')} style={btnBack}>&larr; Zamowienia</button>
+      <button onClick={() => navigate('/orders')} style={btnBack}>{t('orderDetail.backToOrders')}</button>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 700 }}>Zamowienie #{order.id}</h1>
+          <h1 style={{ fontSize: 22, fontWeight: 700 }}>{t('orderDetail.orderTitle', { id: order.id })}</h1>
           <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
             {orderTypeBadge(order.type)}
             {orderStatusBadge(order.status)}
           </div>
           {order.notes && <p style={{ color: '#64748b', marginTop: 8 }}>{order.notes}</p>}
           <p style={{ fontSize: 13, color: '#94a3b8', marginTop: 4 }}>
-            Utworzone: {new Date(order.createdAt).toLocaleString('pl-PL')}
-            {order.completedAt && ` · Zrealizowane: ${new Date(order.completedAt).toLocaleString('pl-PL')}`}
+            {t('orderDetail.createdAt')} {new Date(order.createdAt).toLocaleString(dateLocale)}
+            {order.completedAt && ` · ${t('orderDetail.completedAt')} ${new Date(order.completedAt).toLocaleString(dateLocale)}`}
           </p>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           {isDraft && (
             <button onClick={() => confirmMutation.mutate()} style={btnConfirm} disabled={confirmMutation.isPending}>
-              Potwierdz
+              {t('orderDetail.confirm')}
             </button>
           )}
           {isConfirmed && (
             <button onClick={() => completeMutation.mutate()} style={btnComplete} disabled={completeMutation.isPending}>
-              Zrealizuj
+              {t('orderDetail.complete')}
             </button>
           )}
         </div>
@@ -91,12 +95,12 @@ export function OrderDetail() {
       <table style={tableStyle}>
         <thead>
           <tr style={{ background: '#f8fafc' }}>
-            <th style={th}>Produkt</th>
-            <th style={th}>SKU</th>
-            <th style={th}>Ilosc</th>
-            <th style={th}>Cena jedn.</th>
-            <th style={th}>Suma</th>
-            {isDraft && <th style={th}>Akcje</th>}
+            <th style={th}>{t('orderDetail.colProduct')}</th>
+            <th style={th}>{t('orderDetail.colSku')}</th>
+            <th style={th}>{t('orderDetail.colQty')}</th>
+            <th style={th}>{t('orderDetail.colUnitPrice')}</th>
+            <th style={th}>{t('orderDetail.colSubtotal')}</th>
+            {isDraft && <th style={th}>{t('orderDetail.colActions')}</th>}
           </tr>
         </thead>
         <tbody>
@@ -113,7 +117,7 @@ export function OrderDetail() {
                     onClick={() => deleteItemMutation.mutate(item.id)}
                     style={{ background: '#fee2e2', color: '#dc2626', border: 'none', borderRadius: 6, padding: '3px 10px', cursor: 'pointer', fontSize: 13 }}
                   >
-                    Usun
+                    {t('orderDetail.delete')}
                   </button>
                 </td>
               )}
@@ -129,31 +133,31 @@ export function OrderDetail() {
                     value={newItem.productId}
                     onChange={e => handleProductChange(Number(e.target.value))}
                   >
-                    <option value={0}>Wybierz produkt</option>
+                    <option value={0}>{t('orderDetail.selectProduct')}</option>
                     {products.map(p => (
                       <option key={p.id} value={p.id}>{p.name} ({p.sku})</option>
                     ))}
                   </select>
                   <input
                     style={{ ...inputSm, width: 80 }}
-                    type="number" min={1} placeholder="Ilosc"
+                    type="number" min={1} placeholder={t('orderDetail.qtyPlaceholder')}
                     value={newItem.quantity}
                     onChange={e => setNewItem(prev => ({ ...prev, quantity: Number(e.target.value) }))}
                   />
                   <input
                     style={{ ...inputSm, width: 100 }}
-                    type="number" min={0} step="0.01" placeholder="Cena"
+                    type="number" min={0} step="0.01" placeholder={t('orderDetail.pricePlaceholder')}
                     value={newItem.unitPrice}
                     onChange={e => setNewItem(prev => ({ ...prev, unitPrice: Number(e.target.value) }))}
                   />
                   <button
                     onClick={() => {
-                      if (!newItem.productId) { setAddError('Wybierz produkt'); return; }
+                      if (!newItem.productId) { setAddError(t('orderDetail.selectProductError')); return; }
                       addItemMutation.mutate();
                     }}
                     style={{ background: '#16a34a', color: '#fff', border: 'none', borderRadius: 6, padding: '5px 14px', cursor: 'pointer', fontWeight: 600 }}
                   >
-                    + Dodaj
+                    {t('orderDetail.addItem')}
                   </button>
                   {addError && <span style={{ color: '#dc2626', fontSize: 13 }}>{addError}</span>}
                 </div>
@@ -163,13 +167,13 @@ export function OrderDetail() {
           )}
 
           {order.items.length === 0 && !isDraft && (
-            <tr><td colSpan={5} style={{ ...td, textAlign: 'center', color: '#94a3b8' }}>Brak pozycji</td></tr>
+            <tr><td colSpan={5} style={{ ...td, textAlign: 'center', color: '#94a3b8' }}>{t('orderDetail.noItems')}</td></tr>
           )}
         </tbody>
         {order.items.length > 0 && (
           <tfoot>
             <tr style={{ background: '#f8fafc' }}>
-              <td colSpan={isDraft ? 4 : 3} style={{ ...td, textAlign: 'right', fontWeight: 600 }}>Razem:</td>
+              <td colSpan={isDraft ? 4 : 3} style={{ ...td, textAlign: 'right', fontWeight: 600 }}>{t('orderDetail.total')}</td>
               <td style={{ ...td, fontWeight: 700 }}>
                 {order.items.reduce((s, i) => s + i.subtotal, 0).toFixed(2)} zl
               </td>

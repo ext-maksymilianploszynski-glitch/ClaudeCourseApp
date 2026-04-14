@@ -1,9 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { getProducts, deleteProduct } from '../api/products';
 import { Badge } from '../components/Badge';
 
 export function ProductList() {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const { data: products = [], isLoading } = useQuery({ queryKey: ['products'], queryFn: getProducts });
 
@@ -13,29 +15,29 @@ export function ProductList() {
   });
 
   const handleDelete = (id: number, name: string) => {
-    if (confirm(`Usunac produkt "${name}"?`)) deleteMutation.mutate(id);
+    if (confirm(t('products.confirmDelete', { name }))) deleteMutation.mutate(id);
   };
 
-  if (isLoading) return <p>Ladowanie...</p>;
+  if (isLoading) return <p>{t('products.loading')}</p>;
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700 }}>Produkty</h1>
-        <Link to="/products/new" style={btnPrimary}>+ Dodaj produkt</Link>
+        <h1 style={{ fontSize: 24, fontWeight: 700 }}>{t('products.title')}</h1>
+        <Link to="/products/new" style={btnPrimary}>{t('products.addProduct')}</Link>
       </div>
 
       <table style={tableStyle}>
         <thead>
           <tr style={{ background: '#f8fafc' }}>
-            <th style={th}>Nazwa</th>
-            <th style={th}>SKU</th>
-            <th style={th}>Kategoria</th>
-            <th style={th}>Jednostka</th>
-            <th style={th}>Cena</th>
-            <th style={th}>Stan</th>
-            <th style={th}>Status</th>
-            <th style={th}>Akcje</th>
+            <th style={th}>{t('products.colName')}</th>
+            <th style={th}>{t('products.colSku')}</th>
+            <th style={th}>{t('products.colCategory')}</th>
+            <th style={th}>{t('products.colUnit')}</th>
+            <th style={th}>{t('products.colPrice')}</th>
+            <th style={th}>{t('products.colStock')}</th>
+            <th style={th}>{t('products.colStatus')}</th>
+            <th style={th}>{t('products.colActions')}</th>
           </tr>
         </thead>
         <tbody>
@@ -51,23 +53,23 @@ export function ProductList() {
               </td>
               <td style={td}>
                 {p.isLowStock
-                  ? <Badge text="Niski stan" variant="red" />
-                  : <Badge text="OK" variant="green" />}
+                  ? <Badge text={t('products.lowStock')} variant="red" />
+                  : <Badge text={t('products.ok')} variant="green" />}
               </td>
               <td style={td}>
-                <Link to={`/products/${p.id}/edit`} style={btnSmall}>Edytuj</Link>
+                <Link to={`/products/${p.id}/edit`} style={btnSmall}>{t('products.edit')}</Link>
                 {' '}
                 <button
                   onClick={() => handleDelete(p.id, p.name)}
                   style={{ ...btnSmall, background: '#fee2e2', color: '#dc2626', border: 'none', cursor: 'pointer' }}
                 >
-                  Usun
+                  {t('products.delete')}
                 </button>
               </td>
             </tr>
           ))}
           {products.length === 0 && (
-            <tr><td colSpan={8} style={{ ...td, textAlign: 'center', color: '#94a3b8' }}>Brak produktow</td></tr>
+            <tr><td colSpan={8} style={{ ...td, textAlign: 'center', color: '#94a3b8' }}>{t('products.noProducts')}</td></tr>
           )}
         </tbody>
       </table>

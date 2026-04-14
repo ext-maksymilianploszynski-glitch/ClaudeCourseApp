@@ -1,15 +1,9 @@
+import i18n from '../i18n/i18n';
+
 interface BadgeProps {
   text: string;
   variant: 'green' | 'blue' | 'yellow' | 'red' | 'gray';
 }
-
-const colors: Record<BadgeProps['variant'], string> = {
-  green: '#d1fae5 color:#065f46',
-  blue: '#dbeafe color:#1e40af',
-  yellow: '#fef9c3 color:#854d0e',
-  red: '#fee2e2 color:#991b1b',
-  gray: '#f3f4f6 color:#374151',
-};
 
 export function Badge({ text, variant }: BadgeProps) {
   const style: React.CSSProperties = {
@@ -25,12 +19,14 @@ export function Badge({ text, variant }: BadgeProps) {
 }
 
 export function orderTypeBadge(type: string) {
-  return <Badge text={type} variant={type === 'Incoming' ? 'green' : 'blue'} />;
+  const label = i18n.t(`badge.${type}`, { defaultValue: type });
+  return <Badge text={label} variant={type === 'Incoming' ? 'green' : 'blue'} />;
 }
 
 export function orderStatusBadge(status: string) {
   const map: Record<string, BadgeProps['variant']> = {
     Draft: 'gray', Confirmed: 'yellow', Completed: 'green',
   };
-  return <Badge text={status} variant={map[status] ?? 'gray'} />;
+  const label = i18n.t(`badge.${status}`, { defaultValue: status });
+  return <Badge text={label} variant={map[status] ?? 'gray'} />;
 }

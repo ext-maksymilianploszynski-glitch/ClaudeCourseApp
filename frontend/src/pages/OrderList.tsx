@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { getOrders, deleteOrder } from '../api/orders';
 import { orderTypeBadge, orderStatusBadge } from '../components/Badge';
 import type { OrderType, OrderStatus } from '../types';
 
 export function OrderList() {
+  const { t, i18n } = useTranslation();
   const qc = useQueryClient();
   const [typeFilter, setTypeFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -24,42 +26,44 @@ export function OrderList() {
   });
 
   const handleDelete = (id: number) => {
-    if (confirm(`Usunac zamowienie #${id}?`)) deleteMutation.mutate(id);
+    if (confirm(t('orders.confirmDelete', { id }))) deleteMutation.mutate(id);
   };
 
-  if (isLoading) return <p>Ladowanie...</p>;
+  const dateLocale = i18n.language === 'en' ? 'en-US' : 'pl-PL';
+
+  if (isLoading) return <p>{t('orders.loading')}</p>;
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700 }}>Zamowienia</h1>
-        <Link to="/orders/new" style={btnPrimary}>+ Nowe zamowienie</Link>
+        <h1 style={{ fontSize: 24, fontWeight: 700 }}>{t('orders.title')}</h1>
+        <Link to="/orders/new" style={btnPrimary}>{t('orders.newOrder')}</Link>
       </div>
 
       <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
         <select style={selectStyle} value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
-          <option value="">Wszystkie typy</option>
-          <option value="Incoming">Przyjecie</option>
-          <option value="Outgoing">Wydanie</option>
+          <option value="">{t('orders.allTypes')}</option>
+          <option value="Incoming">{t('orders.incoming')}</option>
+          <option value="Outgoing">{t('orders.outgoing')}</option>
         </select>
         <select style={selectStyle} value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
-          <option value="">Wszystkie statusy</option>
-          <option value="Draft">Draft</option>
-          <option value="Confirmed">Potwierdzone</option>
-          <option value="Completed">Zrealizowane</option>
+          <option value="">{t('orders.allStatuses')}</option>
+          <option value="Draft">{t('orders.draft')}</option>
+          <option value="Confirmed">{t('orders.confirmed')}</option>
+          <option value="Completed">{t('orders.completed')}</option>
         </select>
       </div>
 
       <table style={tableStyle}>
         <thead>
           <tr style={{ background: '#f8fafc' }}>
-            <th style={th}>ID</th>
-            <th style={th}>Typ</th>
-            <th style={th}>Status</th>
-            <th style={th}>Notatki</th>
-            <th style={th}>Data</th>
-            <th style={th}>Pozycje</th>
-            <th style={th}>Akcje</th>
+            <th style={th}>{t('orders.colId')}</th>
+            <th style={th}>{t('orders.colType')}</th>
+            <th style={th}>{t('orders.colStatus')}</th>
+            <th style={th}>{t('orders.colNotes')}</th>
+            <th style={th}>{t('orders.colDate')}</th>
+            <th style={th}>{t('orders.colItems')}</th>
+            <th style={th}>{t('orders.colActions')}</th>
           </tr>
         </thead>
         <tbody>
@@ -69,24 +73,24 @@ export function OrderList() {
               <td style={td}>{orderTypeBadge(o.type)}</td>
               <td style={td}>{orderStatusBadge(o.status)}</td>
               <td style={td}>{o.notes ?? '—'}</td>
-              <td style={td}>{new Date(o.createdAt).toLocaleDateString('pl-PL')}</td>
+              <td style={td}>{new Date(o.createdAt).toLocaleDateString(dateLocale)}</td>
               <td style={td}>{o.itemCount}</td>
               <td style={td}>
-                <Link to={`/orders/${o.id}`} style={btnSmall}>Szczegoly</Link>
+                <Link to={`/orders/${o.id}`} style={btnSmall}>{t('orders.details')}</Link>
                 {' '}
                 {o.status === 'Draft' && (
                   <button
                     onClick={() => handleDelete(o.id)}
                     style={{ ...btnSmall, background: '#fee2e2', color: '#dc2626', border: 'none', cursor: 'pointer' }}
                   >
-                    Usun
+                    {t('orders.delete')}
                   </button>
                 )}
               </td>
             </tr>
           ))}
           {orders.length === 0 && (
-            <tr><td colSpan={7} style={{ ...td, textAlign: 'center', color: '#94a3b8' }}>Brak zamowien</td></tr>
+            <tr><td colSpan={7} style={{ ...td, textAlign: 'center', color: '#94a3b8' }}>{t('orders.noOrders')}</td></tr>
           )}
         </tbody>
       </table>

@@ -2,10 +2,12 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { getProduct, createProduct, updateProduct } from '../api/products';
 import type { ProductRequest } from '../types';
 
 export function ProductForm() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
   const navigate = useNavigate();
@@ -37,48 +39,48 @@ export function ProductForm() {
   return (
     <div style={{ maxWidth: 560 }}>
       <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 28 }}>
-        {isEdit ? 'Edytuj produkt' : 'Nowy produkt'}
+        {isEdit ? t('productForm.editTitle') : t('productForm.newTitle')}
       </h1>
 
       <form onSubmit={handleSubmit(data => mutation.mutate(data))} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        <Field label="Nazwa *">
+        <Field label={t('productForm.name')}>
           <input style={inputStyle} {...register('name', { required: true })} />
-          {errors.name && <span style={errStyle}>Wymagane</span>}
+          {errors.name && <span style={errStyle}>{t('productForm.required')}</span>}
         </Field>
 
-        <Field label="SKU *">
+        <Field label={t('productForm.sku')}>
           <input style={inputStyle} {...register('sku', { required: true })} />
-          {errors.sku && <span style={errStyle}>Wymagane</span>}
+          {errors.sku && <span style={errStyle}>{t('productForm.required')}</span>}
         </Field>
 
-        <Field label="Kategoria">
+        <Field label={t('productForm.category')}>
           <input style={inputStyle} {...register('category')} />
         </Field>
 
-        <Field label="Jednostka miary *">
+        <Field label={t('productForm.unit')}>
           <input style={inputStyle} {...register('unit', { required: true })} placeholder="szt, kg, m..." />
         </Field>
 
-        <Field label="Cena jednostkowa (zl)">
+        <Field label={t('productForm.price')}>
           <input style={inputStyle} type="number" step="0.01" min="0" {...register('price', { valueAsNumber: true })} />
         </Field>
 
-        <Field label="Prog niskiego stanu">
+        <Field label={t('productForm.threshold')}>
           <input style={inputStyle} type="number" min="0" {...register('lowStockThreshold', { valueAsNumber: true })} />
         </Field>
 
         {mutation.isError && (
           <div style={{ color: '#dc2626', fontSize: 14 }}>
-            {(mutation.error as any)?.response?.data || 'Wystapil blad'}
+            {(mutation.error as any)?.response?.data || t('productForm.error')}
           </div>
         )}
 
         <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
           <button type="submit" style={btnPrimary} disabled={mutation.isPending}>
-            {mutation.isPending ? 'Zapisywanie...' : 'Zapisz'}
+            {mutation.isPending ? t('productForm.saving') : t('productForm.save')}
           </button>
           <button type="button" style={btnSecondary} onClick={() => navigate('/products')}>
-            Anuluj
+            {t('productForm.cancel')}
           </button>
         </div>
       </form>
